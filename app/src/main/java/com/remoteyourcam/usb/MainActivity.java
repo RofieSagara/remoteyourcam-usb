@@ -198,6 +198,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onCameraStarted(final Camera camera) {
+        Toast.makeText(this, "onCameraStarted", Toast.LENGTH_SHORT);
         this.camera = camera;
         if (AppConfig.LOG) {
             Log.i(TAG, "camera started");
@@ -245,7 +246,8 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onNoCameraFound() {
-        showDialog(DIALOG_NO_CAMERA);
+        //showDialog(DIALOG_NO_CAMERA);
+        Toast.makeText(this, R.string.dialog_no_camera_title, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -282,6 +284,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onLiveViewData(LiveViewData data) {
+        Toast.makeText(this, Integer.toString(data.nikonWholeWidth) + " Width", Toast.LENGTH_LONG).show();
         if (!isInResume) {
             return;
         }

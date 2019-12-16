@@ -147,7 +147,8 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
 
         focusPointsToggle = (ToggleButton) view.findViewById(R.id.focusPointsToggle);
 
-        isPro = focusPointsToggle != null;
+        //isPro = focusPointsToggle != null;
+        isPro = true;
 
         setupProperty(view, Camera.Property.ShutterSpeed, R.id.shutterSpeedToggle, "Tv");
         if (isPro) {
@@ -539,6 +540,7 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
 
     @Override
     public void liveViewStarted() {
+        Toast.makeText(getContext(), "Hello world", Toast.LENGTH_SHORT).show();
         if (!isPro) {
             return;
         }

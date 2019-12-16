@@ -15,6 +15,8 @@
  */
 package com.remoteyourcam.usb.ptp;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +55,8 @@ public class NikonCamera extends PtpCamera {
     @Override
     protected void onOperationCodesReceived(Set<Integer> operations) {
         supportedOperations = operations;
+        // TODO: Log operations!
+        Log.i("REMOTEYOURCAM", supportedOperations.toString());
         if (operations.contains(Operation.NikonGetLiveViewImage) && operations.contains(Operation.NikonStartLiveView)
                 && operations.contains(Operation.NikonEndLiveView)) {
             liveViewSupported = true;

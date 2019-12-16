@@ -15,6 +15,8 @@
  */
 package com.remoteyourcam.usb.view;
 
+import android.widget.Toast;
+
 import com.remoteyourcam.usb.AppSettings;
 import com.remoteyourcam.usb.ptp.Camera;
 

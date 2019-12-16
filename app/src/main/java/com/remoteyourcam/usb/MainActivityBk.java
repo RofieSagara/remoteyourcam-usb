@@ -324,6 +324,7 @@ public class MainActivityBk extends SessionActivity implements CameraListener {
 
     @Override
     public void onCameraStarted(Camera camera) {
+        Toast.makeText(this, "CAMERA VIEW STARTED", Toast.LENGTH_SHORT);
         this.camera = camera;
         if (AppConfig.LOG) {
             Log.i(TAG, "camera started");
@@ -387,6 +388,7 @@ public class MainActivityBk extends SessionActivity implements CameraListener {
 
     @Override
     public void onLiveViewData(LiveViewData data) {
+        Toast.makeText(this, Integer.toString(data.nikonWholeWidth) + " Width (BK)", Toast.LENGTH_LONG);
         if (!isInResume) {
             return;
         }

@@ -15,6 +15,8 @@
  */
 package com.remoteyourcam.usb.ptp.commands.nikon;
 
+import android.widget.Toast;
+
 import com.remoteyourcam.usb.ptp.NikonCamera;
 import com.remoteyourcam.usb.ptp.PtpAction;
 import com.remoteyourcam.usb.ptp.PtpCamera.IO;
