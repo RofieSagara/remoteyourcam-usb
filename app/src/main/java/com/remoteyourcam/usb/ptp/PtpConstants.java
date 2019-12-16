@@ -40,6 +40,7 @@ public class PtpConstants {
         public static final int NikonD5000 = 0x0423;
         public static final int NikonD5100 = 0x0429;
         public static final int NikonD7000 = 0x0428;
+        public static final int NikonD7100 = 0x0430;
         public static final int NikonD80 = 0x0412;
         public static final int NikonD200 = 0x0410;
         public static final int NikonD3 = 0x041C;

@@ -107,6 +107,7 @@ public class NikonGetLiveViewImageCommand extends NikonCommand {
             pictureOffset = 64;
             break;
         case Product.NikonD7000:
+        case Product.NikonD7100:
         case Product.NikonD5100:
             pictureOffset = 384;
             break;
