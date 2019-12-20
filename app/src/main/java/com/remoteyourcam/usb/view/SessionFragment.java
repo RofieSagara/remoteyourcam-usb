@@ -15,9 +15,12 @@
  */
 package com.remoteyourcam.usb.view;
 
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.remoteyourcam.usb.AppSettings;
+import com.remoteyourcam.usb.R;
 import com.remoteyourcam.usb.ptp.Camera;
 
 public abstract class SessionFragment extends BaseFragment implements SessionView {

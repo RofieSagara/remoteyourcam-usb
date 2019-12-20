@@ -1,33 +1,14 @@
-/**
- * Copyright 2013 Nils Assbeck, Guersel Ayaz and Michael Zoech
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.remoteyourcam.usb;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.hardware.usb.UsbDevice;
 import android.mtp.MtpDevice;
 import android.mtp.MtpObjectInfo;
-import android.mtp.MtpStorageInfo;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,11 +17,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.remoteyourcam.usb.ptp.Camera;
-import com.remoteyourcam.usb.ptp.Camera.CameraListener;
 import com.remoteyourcam.usb.ptp.EosCamera;
 import com.remoteyourcam.usb.ptp.PtpService;
 import com.remoteyourcam.usb.ptp.PtpUsbConnection;
@@ -52,23 +31,19 @@ import com.remoteyourcam.usb.view.TabletSessionFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends SessionActivity implements CameraListener {
-
+public class CameraBaseActivity extends SessionActivity implements Camera.CameraListener {
     private static final int DIALOG_PROGRESS = 1;
     private static final int DIALOG_NO_CAMERA = 2;
 
     private static final String TAG = "Chris remote control";
-    private final Handler handler = new Handler();
 
-    private PtpService ptp;
-    private Camera camera;
-
-    private boolean isInStart;
-    private boolean isInResume;
-    private SessionView sessionFrag;
-    private boolean isLarge;
-    private AppSettings settings;
-    private Toolbar toolbar;
+    protected Camera camera;
+    protected AppSettings settings;
+    protected SessionView sessionFrag;
+    protected boolean isInStart;
+    protected boolean isInResume;
+    protected boolean isLarge;
+    protected PtpService ptp;
 
     @Override
     public Camera getCamera() {
@@ -96,15 +71,13 @@ public class MainActivity extends SessionActivity implements CameraListener {
         settings = new AppSettings(this);
 
         setContentView(R.layout.activity_main);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         ptp = PtpService.Singleton.getInstance(this);
 
-        Fragment f = new TabletSessionFragment();
+       /* Fragment f = new TabletSessionFragment();
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.fragment_container, f)
-                .commit();
+                .commit();*/
     }
 
 
@@ -144,12 +117,6 @@ public class MainActivity extends SessionActivity implements CameraListener {
     @Override
     protected void onStart() {
         super.onStart();
-        if (AppConfig.LOG) {
-            Log.i(TAG, "onStart");
-        }
-        isInStart = true;
-        ptp.setCameraListener(this);
-        ptp.initialize(this, getIntent());
     }
 
     @Override
@@ -184,9 +151,9 @@ public class MainActivity extends SessionActivity implements CameraListener {
                 return ProgressDialog.show(this, "", "Generating information. Please wait...", true);
             case DIALOG_NO_CAMERA:
                 AlertDialog.Builder b = new AlertDialog.Builder(this);
-                b.setTitle(R.string.dialog_no_camera_title);
-                b.setMessage(R.string.dialog_no_camera_message);
-                b.setNeutralButton(R.string.ok, new OnClickListener() {
+                //b.setTitle(R.string.dialog_no_camera_title);
+                //b.setMessage(R.string.dialog_no_camera_message);
+                b.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -222,15 +189,15 @@ public class MainActivity extends SessionActivity implements CameraListener {
                     for (MtpObjectInfo info : infos) {
                         filenames.add(info.getName()); // TODO build tree of files with handles fd
                     }
-                    Intent i = new Intent(MainActivity.this, FilenameActivity.class);
+                    Intent i = new Intent(CameraBaseActivity.this, FilenameActivity.class);
                     i.putExtra("filenames", filenames);
                     startActivity(i);
                 }
             });
         }
-        getSupportActionBar().setTitle(camera.getDeviceName());
+        //getSupportActionBar().setTitle(camera.getDeviceName());
         camera.setCapturedPictureSampleSize(settings.getCapturedPictureSampleSize());
-        sessionFrag.cameraStarted(camera);
+        //sessionFrag.cameraStarted(camera);
     }
 
     @Override
@@ -241,7 +208,7 @@ public class MainActivity extends SessionActivity implements CameraListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         this.camera = null;
-        sessionFrag.cameraStopped(camera);
+        //sessionFrag.cameraStopped(camera);
     }
 
     @Override
@@ -252,8 +219,8 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onError(String message) {
-        sessionFrag.enableUi(false);
-        sessionFrag.cameraStopped(null);
+        // sessionFrag.enableUi(false);
+        // sessionFrag.cameraStopped(null);
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
@@ -269,17 +236,17 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onPropertyDescChanged(int property, int[] values) {
-        sessionFrag.propertyDescChanged(property, values);
+       // sessionFrag.propertyDescChanged(property, values);
     }
 
     @Override
     public void onLiveViewStarted() {
-        sessionFrag.liveViewStarted();
+        //sessionFrag.liveViewStarted();
     }
 
     @Override
     public void onLiveViewStopped() {
-        sessionFrag.liveViewStopped();
+        //sessionFrag.liveViewStopped();
     }
 
     @Override
@@ -287,13 +254,13 @@ public class MainActivity extends SessionActivity implements CameraListener {
         if (!isInResume) {
             return;
         }
-        sessionFrag.liveViewData(data);
+        //sessionFrag.liveViewData(data);
     }
 
     @Override
     public void onCapturedPictureReceived(int objectHandle, String filename, Bitmap thumbnail, Bitmap bitmap) {
         if (thumbnail != null) {
-            sessionFrag.capturedPictureReceived(objectHandle, filename, thumbnail, bitmap);
+            //sessionFrag.capturedPictureReceived(objectHandle, filename, thumbnail, bitmap);
         } else {
             Toast.makeText(this, "No thumbnail available", Toast.LENGTH_SHORT).show();
         }
@@ -301,59 +268,37 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onBulbStarted() {
-        sessionFrag.setCaptureBtnText("0");
+
     }
 
     @Override
     public void onBulbExposureTime(int seconds) {
-        sessionFrag.setCaptureBtnText("" + seconds);
+
     }
 
     @Override
     public void onBulbStopped() {
-        sessionFrag.setCaptureBtnText("Fire");
+
     }
 
     @Override
     public void onFocusStarted() {
-        sessionFrag.focusStarted();
+
     }
 
     @Override
     public void onFocusEnded(boolean hasFocused) {
-        sessionFrag.focusEnded(hasFocused);
+
     }
 
     @Override
     public void onFocusPointsChanged() {
-        // TODO onFocusPointsToggleClicked(null);
+
     }
 
     @Override
     public void onObjectAdded(int handle, int format) {
-        sessionFrag.objectAdded(handle, format);
-    }
-
-    public List<MtpStorageInfo> getStorageList(MtpDevice device) {
-        if (device == null) {
-            return null;
-        }
-        int[] storageIds = device.getStorageIds();
-        if (storageIds == null) {
-            return null;
-        }
-
-        int length = storageIds.length;
-        ArrayList<MtpStorageInfo> storageList = new ArrayList<MtpStorageInfo>(length);
-        for (int i = 0; i < length; i++) {
-            MtpStorageInfo info = device.getStorageInfo(storageIds[i]);
-            if (info == null) {
-                Log.w(TAG, "getStorageInfo failed");
-            } else {
-                storageList.add(info);
-            }
-        }
-        return storageList;
+        //sessionFrag.objectAdded(handle, format);
     }
 
     public List<MtpObjectInfo> getObjectList(MtpDevice device, int storageId, int objectHandle) {

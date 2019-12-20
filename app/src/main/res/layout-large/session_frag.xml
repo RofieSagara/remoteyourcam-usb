@@ -89,6 +89,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge"/>
 
       <Button
+          android:id="@+id/startPhotoboothActivityBtn"
+          android:layout_width="0dp"
+          android:layout_height="48dp"
+          android:layout_weight="1"
+          android:text="@string/start_photobooth_activity" />
+
+      <Button
         android:id="@+id/takePictureBtn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

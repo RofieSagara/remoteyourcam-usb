@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright 2013 Nils Assbeck, Guersel Ayaz and Michael Zoech
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,14 +15,16 @@
 -->
 <resources>
 
-  <color name="windowBackground">#ffdddddd</color>
-  <color name="propertyListBackground">#aadddddd</color>
-  <color name="actionBarBackground">#ffbbbbbb</color>
-  <color name="selectedValueBackground">#ffffffff</color>
-  <color name="colorPrimary">#008577</color>
-  <color name="colorPrimaryDark">#00574B</color>
-  <color name="colorAccent">#D81B60</color>
-  <color name="white">#fff</color>
+    <color name="windowBackground">#ffdddddd</color>
+    <color name="propertyListBackground">#aadddddd</color>
+    <color name="actionBarBackground">#ffbbbbbb</color>
+    <color name="selectedValueBackground">#ffffffff</color>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#fff</color>
+
+    <color name="black_overlay">#66000000</color>
 
 
 </resources>

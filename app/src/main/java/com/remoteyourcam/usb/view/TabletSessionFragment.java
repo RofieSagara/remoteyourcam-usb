@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
@@ -41,6 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.remoteyourcam.usb.FotoboothActivity;
 import com.remoteyourcam.usb.GestureDetector;
 import com.remoteyourcam.usb.PictureView;
 import com.remoteyourcam.usb.PropertyDisplayer;
@@ -76,6 +78,8 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
     private TextView exposureIndicatorText;
     private ImageView batteryLevelView;
     private ToggleButton focusPointsToggle;
+
+    private Button startPhotoboothActivityBtn;
 
     private final Map<Integer, PropertyDisplayer> properties = new HashMap<Integer, PropertyDisplayer>();
 
@@ -136,6 +140,7 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
         histogramToggle = (ToggleButton) view.findViewById(R.id.histogramToggle);
         shootingModeView = (ImageView) view.findViewById(R.id.shootingModeView);
         btnLiveview = (Button) view.findViewById(R.id.btn_liveview);
+        startPhotoboothActivityBtn = (Button) view.findViewById(R.id.startPhotoboothActivityBtn);
 
         btnLiveview.setOnClickListener(new OnClickListener() {
             @Override
@@ -287,6 +292,12 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
                 }
             };
         }
+
+        startPhotoboothActivityBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startPhotoBoothActiviy();
+            }
+        });
 
         enableUi(false);
 
@@ -734,5 +745,11 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
                 }
             }
         });
+    }
+
+
+    protected void startPhotoBoothActiviy() {
+        Intent intent = new Intent(getContext(), FotoboothActivity.class);
+        startActivity(intent);
     }
 }
