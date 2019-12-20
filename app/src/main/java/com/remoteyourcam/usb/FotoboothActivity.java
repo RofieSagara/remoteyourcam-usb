@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +50,11 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     private ProgressBar mCountdownProgressBar;
     private TextView mCountdownText;
     private PictureView mPictureView;
+    private Button mStartPreviewMode;
+    private LinearLayout mDashboardLayout;
+
+    private LiveViewData currentLiveViewData;
+    private LiveViewData currentLiveViewData2;
 
     private int mCurrentCountDownValue;
 
@@ -80,12 +86,12 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            /*mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);*/
         }
     };
     private View mControlsView;
@@ -138,6 +144,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
             public void onFinish() {
                 mCountdownText.setVisibility(View.INVISIBLE);
                 mStartPhotoboothCountdownBtn.setVisibility(View.VISIBLE);
+                camera.capture();
             }
         }.start();
     }
@@ -145,6 +152,8 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        super.setPTPInstance(this);
+        super.setListener(this);
 
         setContentView(R.layout.activity_fotobooth);
         ActionBar actionBar = getSupportActionBar();
@@ -153,22 +162,27 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         }
 
         mVisible = true;
-        mContentView = findViewById(R.id.fullscreen_content);
+        //mContentView = findViewById(R.id.fullscreen_content);
         mStartPhotoboothCountdownBtn = (ImageButton)findViewById(R.id.startPhotoboothCountdownBtn);
         mCountdownText = (TextView) findViewById(R.id.countDownText);
         // mImageView = (ImageView) findViewById(R.id.liveview_preview);
         mPictureView = (PictureView) findViewById(R.id.liveview_preview);
+        mStartPreviewMode = (Button) findViewById(R.id.startPreviewMode);
+        mDashboardLayout = (LinearLayout) findViewById(R.id.layout_dashboard);
 
         mCountdownText.setVisibility(View.INVISIBLE);
 
 
+
+        mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
+        mPictureView.setVisibility(View.INVISIBLE);
         // Set up the user interaction to manually show or hide the system UI.
-        mContentView.setOnClickListener(new View.OnClickListener() {
+        /*mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 toggle();
             }
-        });
+        });*/
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
@@ -180,6 +194,21 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
                 startPhotoCountdown();
             }
         });
+
+        mStartPreviewMode.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startPrevieMode();
+            }
+        });
+    }
+
+    public void startPrevieMode() {
+        mDashboardLayout.setVisibility(View.INVISIBLE);
+        mStartPhotoboothCountdownBtn.setVisibility(View.VISIBLE);
+        mPictureView.setVisibility(View.VISIBLE);
+
+        this.camera.setLiveView(true);
+        camera.getLiveViewPicture(null);
     }
 
     @Override
@@ -193,8 +222,8 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         ptp.initialize(this, getIntent());
     }
     public void onCameraStarted(final Camera camera) {
+        Log.i("FotoboothActivity", "onCameraStarted");
         super.onCameraStarted(camera);
-        this.camera.setLiveView(true);
     }
 
     @Override
@@ -243,8 +272,8 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        /*mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);*/
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
@@ -263,8 +292,24 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
     @Override
     public void onLiveViewData(LiveViewData data) {
+        Log.i("LOG", "on liveviewdata");
         this.mPictureView.setLiveViewData(data);
         camera.getLiveViewPicture(data);
+
+        currentLiveViewData2 = currentLiveViewData;
+        this.currentLiveViewData = data;
+        camera.getLiveViewPicture(currentLiveViewData2);
+
         // sessionFrag.liveViewData(data);
+    }
+
+    @Override
+    public void onCapturedPictureReceived(int objectHandle, String filename, Bitmap thumbnail, Bitmap bitmap) {
+        Log.i("Fotobooth Activity", "Picture Taken");
+        if (thumbnail != null) {
+            //sessionFrag.capturedPictureReceived(objectHandle, filename, thumbnail, bitmap);
+        } else {
+            Toast.makeText(this, "No thumbnail available", Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -167,8 +167,22 @@ public class MainActivity extends SessionActivity implements CameraListener {
     @Override
     protected void onStop() {
         super.onStop();
+        /*if (AppConfig.LOG) {
+            Log.i(TAG, "onStop (MainActivity on Stop)");
+        }
+        isInStart = false;
+        ptp.setCameraListener(null);
+        if (isFinishing()) {
+            ptp.shutdown();
+        }
+         */
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         if (AppConfig.LOG) {
-            Log.i(TAG, "onStop");
+            Log.i(TAG, "onDestroy");
         }
         isInStart = false;
         ptp.setCameraListener(null);
@@ -222,9 +236,9 @@ public class MainActivity extends SessionActivity implements CameraListener {
                     for (MtpObjectInfo info : infos) {
                         filenames.add(info.getName()); // TODO build tree of files with handles fd
                     }
-                    Intent i = new Intent(MainActivity.this, FilenameActivity.class);
-                    i.putExtra("filenames", filenames);
-                    startActivity(i);
+                    //Intent i = new Intent(MainActivity.this, FilenameActivity.class);
+                    //i.putExtra("filenames", filenames);
+                    //startActivity(i);
                 }
             });
         }

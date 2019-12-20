@@ -93,5 +93,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="photobooth_take_photo">Take photo</string>
     <string name="start_photobooth_activity">Photobooth-Mode</string>
+    <string name="start_preview_mode">zum Starten Bildschirm berühren</string>
 
 </resources>

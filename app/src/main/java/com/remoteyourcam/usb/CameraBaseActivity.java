@@ -3,6 +3,7 @@ package com.remoteyourcam.usb;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -45,6 +46,8 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
     protected boolean isLarge;
     protected PtpService ptp;
 
+    private Camera.CameraListener listener;
+
     @Override
     public Camera getCamera() {
         return camera;
@@ -70,8 +73,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
 
         settings = new AppSettings(this);
 
-        setContentView(R.layout.activity_main);
-        ptp = PtpService.Singleton.getInstance(this);
+//        setContentView(R.layout.activity_main);
 
        /* Fragment f = new TabletSessionFragment();
         getSupportFragmentManager()
@@ -80,6 +82,15 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
                 .commit();*/
     }
 
+    public void setPTPInstance(Context context) {
+        ptp = PtpService.Singleton.getInstance(context);
+    }
+
+    public void setListener(Camera.CameraListener listener) {
+        this.listener = listener;
+        ptp.setCameraListener(listener);
+        Log.i("BASE", "SETTING NEW LISTENER!");
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -105,7 +116,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
 
         if (id == R.id.action_reload) {
             isInStart = true;
-            ptp.setCameraListener(this);
+            ptp.setCameraListener(listener);
             ptp.initialize(this, getIntent());
             return true;
         }
@@ -135,7 +146,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
     protected void onStop() {
         super.onStop();
         if (AppConfig.LOG) {
-            Log.i(TAG, "onStop");
+            Log.i(TAG, "onStop (CameraBaseActivity)");
         }
         isInStart = false;
         ptp.setCameraListener(null);
@@ -168,7 +179,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
         Toast.makeText(this, "onCameraStarted", Toast.LENGTH_SHORT);
         this.camera = camera;
         if (AppConfig.LOG) {
-            Log.i(TAG, "camera started");
+            Log.i("Base Activity!", "camera started");
         }
         try {
             dismissDialog(DIALOG_NO_CAMERA);
@@ -226,7 +237,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
 
     @Override
     public void onPropertyChanged(int property, int value) {
-        sessionFrag.propertyChanged(property, value);
+        //sessionFrag.propertyChanged(property, value);
     }
 
     @Override
@@ -251,6 +262,7 @@ public class CameraBaseActivity extends SessionActivity implements Camera.Camera
 
     @Override
     public void onLiveViewData(LiveViewData data) {
+        Log.i("LOG", "on liveviewdata");
         if (!isInResume) {
             return;
         }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="@color/neutral_grey"
     app:flow_verticalAlign="center"
     tools:context=".FotoboothActivity">
 
@@ -12,50 +12,74 @@
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
 
-    <TextView
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold" />
-
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
-    <com.remoteyourcam.usb.PictureView
-        android:id="@+id/liveview_preview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:id="@+id/layout_dashboard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:gravity="bottom|center"
+        android:orientation="vertical">
 
-    <RelativeLayout
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="70"
+            app:srcCompat="@drawable/dashimage_photobooth" />
+
+        <Button
+            android:id="@+id/startPreviewMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:foregroundTint="@color/design_default_color_on_primary"
+            android:scaleX="1.5"
+            android:scaleY="1.5"
+            android:text="@string/start_preview_mode"
+            android:textColor="@color/design_default_color_on_primary" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center|center_horizontal|center_vertical"
-        android:fitsSystemWindows="true"
-        android:foregroundGravity="center_vertical|center|center_horizontal"
-        android:gravity="center|center_horizontal|center_vertical"
-        android:textAlignment="center">
+        android:orientation="vertical">
+
+        <com.remoteyourcam.usb.PictureView
+            android:id="@+id/liveview_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:foregroundGravity="center_horizontal"
+            android:scaleX="-1"
+            android:visibility="visible" />
 
         <ImageButton
             android:id="@+id/startPhotoboothCountdownBtn"
-            android:layout_width="112dp"
-            android:layout_height="108dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:background="@drawable/button_bg_round"
             android:contentDescription="@string/photobooth_take_photo"
+            android:elevation="8dp"
+            android:scaleX="2"
+            android:scaleY="2"
             app:srcCompat="@android:drawable/ic_menu_camera" />
 
         <TextView
             android:id="@+id/countDownText"
             android:layout_width="742dp"
             android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal|center_vertical"
             android:text="5"
             android:textAlignment="center"
             android:textSize="30sp" />
-
-    </RelativeLayout>
-
+    </FrameLayout>
 </FrameLayout>

@@ -163,6 +163,8 @@ public class NikonGetLiveViewImageCommand extends NikonCommand {
             if (AppConfig.LOG) {
                 PacketUtil.logHexdump(TAG, b.array(), start, 512);
             }
+        } catch (OutOfMemoryError e) {
+            System.gc();
         }
     }
 }
