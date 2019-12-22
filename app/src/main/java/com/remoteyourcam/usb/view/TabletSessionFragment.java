@@ -26,6 +26,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -634,6 +635,7 @@ public class TabletSessionFragment extends SessionFragment implements GestureDet
 
     @Override
     public void capturedPictureReceived(int objectHandle, String filename, Bitmap thumbnail, Bitmap bitmap) {
+        Log.i("TABLETSESSION", "captured picture received!!");
         if (!inStart) {
             bitmap.recycle();
             return;

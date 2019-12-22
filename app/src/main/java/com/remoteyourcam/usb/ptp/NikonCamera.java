@@ -177,6 +177,7 @@ public class NikonCamera extends PtpCamera {
     }
 
     public void onEventCaptureComplete() {
+        Log.i("NikonCamera", "HERES THE DAMMNED CAPTURE EVENT!!!");
         //TODO
     }
 

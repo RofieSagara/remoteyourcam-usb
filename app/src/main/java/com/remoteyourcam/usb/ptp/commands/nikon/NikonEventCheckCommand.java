@@ -70,6 +70,8 @@ public class NikonEventCheckCommand extends NikonCommand {
             case Event.CaptureComplete:
                 camera.onEventCaptureComplete();
                 break;
+            default:
+                Log.i("UNKNOWN EVENT", Float.toHexString(eventCode));
             }
         }
     }

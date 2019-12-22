@@ -3,12 +3,8 @@ package com.remoteyourcam.usb;
 import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.mtp.MtpDevice;
-import android.mtp.MtpObjectInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -16,8 +12,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,36 +23,62 @@ import android.widget.Toast;
 
 import androidx.core.app.NavUtils;
 
+import com.google.zxing.WriterException;
 import com.remoteyourcam.usb.ptp.Camera;
-import com.remoteyourcam.usb.ptp.EosCamera;
-import com.remoteyourcam.usb.ptp.PtpUsbConnection;
+import com.remoteyourcam.usb.ptp.PtpConstants;
 import com.remoteyourcam.usb.ptp.model.LiveViewData;
-import com.remoteyourcam.usb.view.SessionActivity;
-import com.remoteyourcam.usb.view.SessionView;
+import com.remoteyourcam.usb.ptp.model.ObjectInfo;
+import com.remoteyourcam.usb.util.AsyncResponse;
+import com.remoteyourcam.usb.util.Upload;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FotoboothActivity extends CameraBaseActivity implements Camera.CameraListener {
+public class FotoboothActivity extends CameraBaseActivity implements Camera.CameraListener, Camera.StorageInfoListener,
+        Camera.RetrieveImageInfoListener, Camera.RetrieveImageListener, AsyncResponse {
 
     private Handler handler;
     private Runnable runnable;
 
-    private ImageButton mStartPhotoboothCountdownBtn;
-    private ProgressBar mCountdownProgressBar;
+    private Button mStartPhotoboothCountdownBtn;
     private TextView mCountdownText;
     private PictureView mPictureView;
+    private ImageView mLiveView;
     private Button mStartPreviewMode;
     private LinearLayout mDashboardLayout;
+    private FrameLayout mPictureTakenLayout;
+    private FrameLayout mPreviewLayout;
+    private Button mKeepPictureBtn;
+    private Button mCancelPictureBtn;
+    private FrameLayout mReviewLayout;
+    private Button mTakeNewPhotoBtn;
+    private Button mShowQrBtn;
+    private ImageView mReviewPicture;
+    private ImageView mQrImageView;
+    private FrameLayout mQRLayout;
+    private Button mQrNewPhotoBtn;
+
+    private ImageView mTakenPicture;
 
     private LiveViewData currentLiveViewData;
     private LiveViewData currentLiveViewData2;
 
     private int mCurrentCountDownValue;
+    private Bitmap mTakenPictureBitmap;
+
+    private Upload uploader = new Upload();
+
+    private String photoDownloadLink;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -86,12 +108,12 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            /*mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);*/
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
     private View mControlsView;
@@ -103,7 +125,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
             if (actionBar != null) {
                 actionBar.show();
             }
-            //mControlsView.setVisibility(View.VISIBLE);
+            mControlsView.setVisibility(View.VISIBLE);
         }
     };
     private boolean mVisible;
@@ -132,19 +154,22 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         this.mCurrentCountDownValue = 5;
         mCountdownText.setVisibility(View.VISIBLE);
         mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
+        mCountdownText.setText(Integer.toString(mCurrentCountDownValue));
 
-        new CountDownTimer(mCurrentCountDownValue * 1000, 1000) {
+        new CountDownTimer(mCurrentCountDownValue * 1000 + 2, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 // Toast.makeText(getBaseContext(), Integer.toString(mCurrentCountDownValue), Toast.LENGTH_SHORT).show();
-                mCountdownText.setText(Integer.toString(mCurrentCountDownValue));
                 mCurrentCountDownValue--;
+                mCountdownText.setText(Integer.toString(mCurrentCountDownValue));
             }
 
             public void onFinish() {
-                mCountdownText.setVisibility(View.INVISIBLE);
-                mStartPhotoboothCountdownBtn.setVisibility(View.VISIBLE);
-                camera.capture();
+                mCurrentCountDownValue--;
+                mCountdownText.setText(Integer.toString(mCurrentCountDownValue));
+                Log.i("PhotoboothActivity", "Capture!");
+                startPictureTakenMode();
+                //camera.retrievePicture();
             }
         }.start();
     }
@@ -162,20 +187,43 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         }
 
         mVisible = true;
-        //mContentView = findViewById(R.id.fullscreen_content);
-        mStartPhotoboothCountdownBtn = (ImageButton)findViewById(R.id.startPhotoboothCountdownBtn);
+        mContentView = findViewById(R.id.fullscreen_content);
+        mStartPhotoboothCountdownBtn = (Button)findViewById(R.id.startPhotoboothCountdownBtn);
         mCountdownText = (TextView) findViewById(R.id.countDownText);
         // mImageView = (ImageView) findViewById(R.id.liveview_preview);
         mPictureView = (PictureView) findViewById(R.id.liveview_preview);
+        mLiveView = (ImageView) findViewById(R.id.liveview_preview_2);
         mStartPreviewMode = (Button) findViewById(R.id.startPreviewMode);
         mDashboardLayout = (LinearLayout) findViewById(R.id.layout_dashboard);
+        mTakenPicture = (ImageView) findViewById(R.id.taken_picture);
+        mPictureTakenLayout = (FrameLayout) findViewById(R.id.layout_picture_taken);
+        mPreviewLayout = (FrameLayout) findViewById(R.id.layout_preview);
+
+        mKeepPictureBtn = (Button) findViewById(R.id.keep_picture);
+        mCancelPictureBtn = (Button) findViewById(R.id.cancel_picture);
+
+        mReviewLayout = (FrameLayout) findViewById(R.id.layout_picture_review);
+        mTakeNewPhotoBtn = (Button) findViewById(R.id.button_take_new_photo);
+        mShowQrBtn = (Button) findViewById(R.id.button_show_qr);
+        mReviewPicture = (ImageView) findViewById(R.id.bitmap_review_picture);
+        mQrImageView = (ImageView) findViewById(R.id.qr_image);
+
+        mQRLayout = (FrameLayout) findViewById(R.id.layout_qr);
+        mQrNewPhotoBtn = (Button) findViewById(R.id.qr_new_photo_button);
 
         mCountdownText.setVisibility(View.INVISIBLE);
 
+        uploader.setDelegate(this);
 
+
+        //Upload.upload(image, "Filename.jpg");
 
         mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
         mPictureView.setVisibility(View.INVISIBLE);
+        mLiveView.setVisibility(View.INVISIBLE);
+        mPictureTakenLayout.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.INVISIBLE);
+        mQRLayout.setVisibility(View.INVISIBLE);
         // Set up the user interaction to manually show or hide the system UI.
         /*mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,15 +248,107 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
                 startPrevieMode();
             }
         });
+
+        mCancelPictureBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mTakenPicture.setImageBitmap(null);
+                startPrevieMode();
+            }
+        });
+
+        mKeepPictureBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startReviewMode();
+            }
+        });
+
+        mTakeNewPhotoBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startPrevieMode();
+            }
+        });
+        mQrNewPhotoBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startPrevieMode();
+            }
+        });
+
+        mShowQrBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startQRMode();
+            }
+        });
     }
 
     public void startPrevieMode() {
+        mLiveView.setImageBitmap(null);
+        mPreviewLayout.setVisibility(View.VISIBLE);
         mDashboardLayout.setVisibility(View.INVISIBLE);
         mStartPhotoboothCountdownBtn.setVisibility(View.VISIBLE);
-        mPictureView.setVisibility(View.VISIBLE);
+        //mPictureView.setVisibility(View.VISIBLE);
+        mLiveView.setVisibility(View.VISIBLE);
+        mPictureTakenLayout.setVisibility(View.INVISIBLE);
+        mTakenPicture.setVisibility(View.VISIBLE);
+        mCountdownText.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.INVISIBLE);
+        mQRLayout.setVisibility(View.INVISIBLE);
 
         this.camera.setLiveView(true);
         camera.getLiveViewPicture(null);
+    }
+
+
+    public void startPictureTakenMode() {
+        mTakenPicture.setImageBitmap(null);
+        mKeepPictureBtn.setEnabled(false);
+        camera.capture();
+        //camera.retrievePicture(1);
+        mPreviewLayout.setVisibility(View.INVISIBLE);
+        mDashboardLayout.setVisibility(View.INVISIBLE);
+        mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
+        mPictureView.setVisibility(View.INVISIBLE);
+        mLiveView.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.INVISIBLE);
+        mQRLayout.setVisibility(View.INVISIBLE);
+        camera.retrieveStorages(this);
+
+        mPictureTakenLayout.setVisibility(View.VISIBLE);
+    }
+
+
+    public void startReviewMode() {
+        mReviewPicture.setImageBitmap(mTakenPictureBitmap);
+        mDashboardLayout.setVisibility(View.INVISIBLE);
+        mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
+        mPictureView.setVisibility(View.INVISIBLE);
+        mLiveView.setVisibility(View.INVISIBLE);
+        mPictureTakenLayout.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.VISIBLE);
+        mQRLayout.setVisibility(View.INVISIBLE);
+        startUpload();
+
+
+    }
+
+    public void startQRMode() {
+        mDashboardLayout.setVisibility(View.INVISIBLE);
+        mStartPhotoboothCountdownBtn.setVisibility(View.INVISIBLE);
+        mPictureView.setVisibility(View.INVISIBLE);
+        mLiveView.setVisibility(View.INVISIBLE);
+        mPictureTakenLayout.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.INVISIBLE);
+
+        mQRLayout.setVisibility(View.VISIBLE);
+
+
+    }
+
+    public void startUpload() {
+        try {
+           uploader.execute(mTakenPictureBitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -272,8 +412,8 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     @SuppressLint("InlinedApi")
     private void show() {
         // Show the system bar
-        /*mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);*/
+        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
@@ -293,14 +433,23 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     @Override
     public void onLiveViewData(LiveViewData data) {
         Log.i("LOG", "on liveviewdata");
-        this.mPictureView.setLiveViewData(data);
-        camera.getLiveViewPicture(data);
+        //this.mPictureView.setLiveViewData(data);
+        if (data == null || data.bitmap == null) {
+            return;
+        }
+        this.mLiveView.setImageBitmap(data.bitmap);
+        // this.mTakenPicture.setImageBitmap(data.bitmap);
 
         currentLiveViewData2 = currentLiveViewData;
         this.currentLiveViewData = data;
         camera.getLiveViewPicture(currentLiveViewData2);
 
         // sessionFrag.liveViewData(data);
+    }
+
+    @Override
+    public void onLiveViewStopped() {
+       Log.i("FotoboothActivity", "LiveView stopped");
     }
 
     @Override
@@ -311,5 +460,80 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         } else {
             Toast.makeText(this, "No thumbnail available", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onImageRetrieved(int objectHandle, final Bitmap image) {
+        //
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mTakenPicture.setImageBitmap(image);
+                mTakenPictureBitmap = image;
+                mKeepPictureBtn.setEnabled(true);
+            }
+        });
+    }
+
+    @Override
+    public void onObjectAdded(int handle, int format) {
+        //sessionFrag.objectAdded(handle, format);
+        Log.i("FotoboothActivity", "objectAdded!".concat(Integer.toString(handle)));
+       camera.retrieveImage(this, handle); // todo: test!!
+    }
+
+    @Override
+    public void onStorageFound(int handle, String label) {
+        Log.i("FotoboothActivity", "Storage found!!".concat(label));
+        camera.retrieveImageHandles(this, handle);
+    }
+
+    @Override
+    public void onAllStoragesFound() {
+
+    }
+
+    @Override
+    public void onImageHandlesRetrieved(int[] handles) {
+        Log.i("FotoboothActivity", "Handles received (%s)".concat(Integer.toString(handles.length)));
+    }
+
+    @Override
+    public void onImageInfoRetrieved(int objectHandle, ObjectInfo objectInfo, Bitmap thumbnail) {
+
+    }
+
+    @Override
+    public void processFinish(String output) {
+        try {
+            JSONObject obj = new JSONObject(output);
+            Integer imageId = obj.getJSONObject("image").getInt("id");
+            photoDownloadLink = "https://weddingapi.never-al.one/getImage/".concat(Integer.toString(imageId));
+
+            QRGEncoder qrgEncoder = new QRGEncoder(
+                    photoDownloadLink, null,
+                    QRGContents.Type.TEXT,
+                    512);
+            try {
+                final Bitmap qrCodeBitm = qrgEncoder.encodeAsBitmap();
+                //
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        mQrImageView.setImageBitmap(qrCodeBitm);
+                    }
+                });
+
+            } catch (WriterException e) {
+                Log.v("QRCODING", e.toString());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

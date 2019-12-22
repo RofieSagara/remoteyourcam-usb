@@ -339,6 +339,7 @@ public abstract class PtpCamera implements Camera {
 
     public void onPictureReceived(final int objectHandle, final String filename, final Bitmap thumbnail,
             final Bitmap bitmap) {
+        Log.d("PtpCamera", "onPictureReceived");
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -866,6 +867,10 @@ public abstract class PtpCamera implements Camera {
     @Override
     public void retrieveImageHandles(StorageInfoListener listener, int storageId, int objectFormat) {
         queue.add(new GetObjectHandlesCommand(this, listener, storageId, objectFormat));
+    }
+    @Override
+    public void retrieveImageHandles(StorageInfoListener listener, int storageId) {
+        queue.add(new GetObjectHandlesCommand(this, listener, storageId));
     }
 
     @Override

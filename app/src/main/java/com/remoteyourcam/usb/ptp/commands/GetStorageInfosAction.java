@@ -59,6 +59,7 @@ public class GetStorageInfosAction implements PtpAction {
                 label = "Storage " + i;
             }
             listener.onStorageFound(storageId, label);
+            break;
         }
 
         listener.onAllStoragesFound();

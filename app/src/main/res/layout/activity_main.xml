@@ -13,7 +13,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
-            app:title="Meero instant shoot"
+            app:title="Photoboothie"
             app:titleTextColor="@color/white"
             android:id="@+id/toolbar"
             android:background="@color/colorPrimary"

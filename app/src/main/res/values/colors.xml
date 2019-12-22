@@ -20,7 +20,8 @@
     <color name="actionBarBackground">#ffbbbbbb</color>
     <color name="selectedValueBackground">#ffffffff</color>
     <color name="colorPrimary">#009a9f</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimaryDark">#006b71</color>
+    <color name="colorPrimaryLight">#55cbd0</color>
     <color name="colorAccent">#D81B60</color>
     <color name="white">#fff</color>
 

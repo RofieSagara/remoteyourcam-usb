@@ -48,11 +48,10 @@ public class NikonGetLiveViewImageCommand extends NikonCommand {
             this.data = new LiveViewData();
             //this.data.histogram = ByteBuffer.allocate(1024 * 4);
             //this.data.histogram.order(ByteOrder.LITTLE_ENDIAN);
-        } else {
-            this.data = data;
         }
         options = new BitmapFactory.Options();
         options.inBitmap = this.data.bitmap;
+        options.inMutable = true;
         options.inSampleSize = 1;
         options.inTempStorage = tmpStorage;
         this.data.bitmap = null;

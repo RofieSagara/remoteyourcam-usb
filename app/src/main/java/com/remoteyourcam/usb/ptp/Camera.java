@@ -183,6 +183,8 @@ public interface Camera {
 
     void retrieveImageHandles(StorageInfoListener listener, int storageId, int objectFormat);
 
+    void retrieveImageHandles(StorageInfoListener listener, int storageId);
+
     void retrieveImageInfo(RetrieveImageInfoListener listener, int objectHandle);
 
     void retrieveImage(RetrieveImageListener listener, int objectHandle);

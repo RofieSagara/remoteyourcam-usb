@@ -16,8 +16,8 @@
 <resources>
 
     <!-- App specific, need to be overridden -->
-    <string name="app_name">Meero instant shoot</string>
-    <string name="launcher_label">Meero instant shoot</string>
+    <string name="app_name">Photoboothie</string>
+    <string name="launcher_label">Photoboothie</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
 
@@ -54,7 +54,7 @@
     <string name="whats_new">What\'s New</string>
 
     <!-- worker notification -->
-    <string name="worker_ticker">RYC is running</string>
+    <string name="worker_ticker">Photoboothie is running</string>
     <string name="worker_content_title">@string/launcher_label</string>
     <string name="worker_content_text">Is running!</string>
 

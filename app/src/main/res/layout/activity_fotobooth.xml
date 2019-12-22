@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fullscreen_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/neutral_grey"
@@ -21,7 +22,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
         android:gravity="bottom|center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <ImageView
             android:id="@+id/imageView"
@@ -34,13 +36,16 @@
             android:id="@+id/startPreviewMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/colorPrimary"
             android:foregroundTint="@color/design_default_color_on_primary"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
+            android:paddingLeft="15dp"
+            android:paddingTop="20dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="20dp"
             android:text="@string/start_preview_mode"
-            android:textColor="@color/design_default_color_on_primary" />
+            android:textColor="@color/design_default_color_on_primary"
+            android:textSize="24sp" />
 
     </LinearLayout>
 
@@ -49,7 +54,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center|center_horizontal|center_vertical"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/liveview_preview_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:scaleType="fitCenter"
+            android:scaleX="-1"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
         <com.remoteyourcam.usb.PictureView
             android:id="@+id/liveview_preview"
@@ -58,28 +73,269 @@
             android:layout_gravity="center_horizontal"
             android:foregroundGravity="center_horizontal"
             android:scaleX="-1"
-            android:visibility="visible" />
+            android:visibility="invisible" />
 
-        <ImageButton
+        <Button
             android:id="@+id/startPhotoboothCountdownBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerInParent="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_gravity="center_horizontal|center_vertical"
             android:background="@drawable/button_bg_round"
             android:contentDescription="@string/photobooth_take_photo"
+            android:drawableLeft="@drawable/ic_camera_alt_black_24dp"
             android:elevation="8dp"
-            android:scaleX="2"
-            android:scaleY="2"
-            app:srcCompat="@android:drawable/ic_menu_camera" />
+            android:paddingLeft="22dp"
+            android:textSize="50sp"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/countDownText"
-            android:layout_width="742dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
+            android:shadowColor="#7F000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2"
             android:text="5"
             android:textAlignment="center"
-            android:textSize="30sp" />
+            android:textColor="@color/design_default_color_on_primary"
+            android:textSize="75sp" />
     </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_picture_taken"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/loading_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:maxWidth="70dp"
+                android:maxHeight="70dp"
+                android:minWidth="70dp"
+                android:minHeight="70dp" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Foto wird geladen..."
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/taken_picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/keep_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorPrimary"
+                android:drawableLeft="@drawable/ic_check_white_24dp"
+                android:foregroundTint="@color/design_default_color_on_primary"
+                android:paddingLeft="15dp"
+                android:paddingTop="20dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="20dp"
+                android:text="Behalten"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/cancel_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_clear_black_24dp"
+                android:paddingLeft="15sp"
+                android:paddingTop="20sp"
+                android:paddingRight="15sp"
+                android:paddingBottom="20sp"
+                android:text="Abbrechen"
+                android:textSize="24sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_picture_review"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/bitmap_review_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="90dp"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_show_qr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorPrimary"
+                android:drawableLeft="@drawable/ic_smartphone_white_24dp"
+                android:paddingLeft="15dp"
+                android:paddingTop="20dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="20dp"
+                android:text="Download aufs Smartphone"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/button_take_new_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/colorPrimary"
+                android:drawableStart="@android:drawable/ic_menu_camera"
+                android:paddingLeft="15dp"
+                android:paddingTop="20dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="20dp"
+                android:text="Neues Foto"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_qr"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginRight="20dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="0.8"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/qr_image"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:layout_marginTop="@dimen/gridPropertyHeight"
+                        android:layout_weight="1"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="0.2"
+                    app:srcCompat="@drawable/ic_chevron_right_white_60dp" />
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_cloud_download_white_120dp" />
+
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="0.2"
+                    app:srcCompat="@drawable/ic_chevron_right_white_60dp" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_weight="1"
+                    android:scaleX="1"
+                    android:scaleY="1"
+                    app:srcCompat="@drawable/ic_smartphone_white_120dp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Scanne diesen QR-Code mit deinem Handy um das Bild herunterzuladen"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/qr_new_photo_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:drawableLeft="@android:drawable/ic_menu_camera"
+                android:paddingLeft="15dp"
+                android:paddingTop="20dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="20dp"
+                android:text="Neues Foto"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+    </FrameLayout>
+
 </FrameLayout>

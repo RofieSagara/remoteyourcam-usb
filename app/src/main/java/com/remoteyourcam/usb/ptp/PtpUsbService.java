@@ -82,6 +82,7 @@ public class PtpUsbService implements PtpService {
     public void setCameraListener(CameraListener listener) {
         this.listener = listener;
         if (camera != null) {
+            Log.i(TAG, "setting actual camera!");
             camera.setListener(listener);
         }
     }

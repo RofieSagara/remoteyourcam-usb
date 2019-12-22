@@ -38,7 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.remoteyourcam.usb.FotoboothActivity;
+//import com.remoteyourcam.usb.FotoboothActivity;
 import com.remoteyourcam.usb.GestureDetector;
 import com.remoteyourcam.usb.PictureView;
 import com.remoteyourcam.usb.PropertyDisplayer;
@@ -746,7 +746,7 @@ public class TabletSessionFragmentBk extends SessionFragmentBk implements Gestur
     }
 
     protected void startPhotoBoothActiviy() {
-        Intent intent = new Intent(String.valueOf(FotoboothActivity.class));
-        startActivity(intent);
+        //Intent intent = new Intent(String.valueOf(FotoboothActivity.class));
+        //startActivity(intent);
     }
 }
