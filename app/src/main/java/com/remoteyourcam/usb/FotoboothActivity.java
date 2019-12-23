@@ -187,7 +187,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
         powerSavingService = new PowerSavingService(this, this);
 
-        PictureOperations.setBorderBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.border));
+        PictureOperations.setBorderBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.rahmen_silvester));
 
         mVisible = true;
         mContentView = findViewById(R.id.fullscreen_content);
