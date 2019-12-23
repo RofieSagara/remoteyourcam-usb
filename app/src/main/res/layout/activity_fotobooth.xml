@@ -175,7 +175,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableLeft="@drawable/ic_clear_black_24dp"
+                android:drawableStart="@drawable/ic_clear_black_24dp"
                 android:paddingLeft="15sp"
                 android:paddingTop="20sp"
                 android:paddingRight="15sp"
@@ -208,33 +208,15 @@
 
             <Button
                 android:id="@+id/button_show_qr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
+                style="@style/Widget.AppCompat.Button.Big"
                 android:drawableLeft="@drawable/ic_smartphone_white_24dp"
-                android:paddingLeft="15dp"
-                android:paddingTop="20dp"
-                android:paddingRight="15dp"
-                android:paddingBottom="20dp"
-                android:text="Download aufs Smartphone"
-                android:textColor="@color/design_default_color_on_primary"
-                android:textSize="24sp" />
+                android:text="Download aufs Smartphone" />
 
             <Button
                 android:id="@+id/button_take_new_photo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:drawableStart="@android:drawable/ic_menu_camera"
-                android:paddingLeft="15dp"
-                android:paddingTop="20dp"
-                android:paddingRight="15dp"
-                android:paddingBottom="20dp"
-                android:text="Neues Foto"
-                android:textColor="@color/design_default_color_on_primary"
-                android:textSize="24sp" />
+                style="@style/Widget.AppCompat.Button.Big"
+                android:drawableLeft="@drawable/ic_smartphone_white_24dp"
+                android:text="@string/take_new_photo_text" />
         </LinearLayout>
 
     </FrameLayout>
@@ -255,6 +237,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -269,9 +252,16 @@
                         android:layout_width="300dp"
                         android:layout_height="300dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:layout_marginTop="@dimen/gridPropertyHeight"
                         android:layout_weight="1"
+                        android:scaleType="fitCenter"
                         tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        style="@style/Widget.AppCompat.TextView.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="1. QR-Code scannen" />
 
                 </LinearLayout>
 
@@ -283,13 +273,29 @@
                     android:layout_weight="0.2"
                     app:srcCompat="@drawable/ic_chevron_right_white_60dp" />
 
-                <ImageView
-                    android:id="@+id/imageView4"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_cloud_download_white_120dp" />
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="300dp"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        app:srcCompat="@drawable/ic_cloud_download_white_120dp" />
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        style="@style/Widget.AppCompat.TextView.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_weight="0.8"
+                        android:text="2. Foto herunterladen" />
+                </LinearLayout>
 
                 <ImageView
                     android:id="@+id/imageView5"
@@ -299,42 +305,42 @@
                     android:layout_weight="0.2"
                     app:srcCompat="@drawable/ic_chevron_right_white_60dp" />
 
-                <ImageView
-                    android:id="@+id/imageView2"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:scaleX="1"
-                    android:scaleY="1"
-                    app:srcCompat="@drawable/ic_smartphone_white_120dp" />
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="300dp"
+                        android:layout_gravity="center_horizontal|center_vertical"
+                        android:scaleX="1"
+                        android:scaleY="1"
+                        app:srcCompat="@drawable/ic_smartphone_white_120dp" />
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        style="@style/Widget.AppCompat.TextView.Big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="3. Fertig" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Scanne diesen QR-Code mit deinem Handy um das Bild herunterzuladen"
-                android:textColor="@color/design_default_color_on_primary"
-                android:textSize="24sp" />
-
-            <Button
-                android:id="@+id/qr_new_photo_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginBottom="20dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:drawableLeft="@android:drawable/ic_menu_camera"
-                android:paddingLeft="15dp"
-                android:paddingTop="20dp"
-                android:paddingRight="15dp"
-                android:paddingBottom="20dp"
-                android:text="Neues Foto"
-                android:textColor="@color/design_default_color_on_primary"
-                android:textSize="24sp" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/qr_new_photo_button"
+            style="@style/Widget.AppCompat.Button.Big"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:drawableStart="@android:drawable/ic_menu_camera"
+            android:text="@string/take_new_photo_text" />
 
     </FrameLayout>
 
