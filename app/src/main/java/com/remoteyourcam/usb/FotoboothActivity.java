@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 
 import androidx.appcompat.app.ActionBar;
 
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -14,10 +16,8 @@ import android.view.View;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,17 +25,15 @@ import androidx.core.app.NavUtils;
 
 import com.google.zxing.WriterException;
 import com.remoteyourcam.usb.ptp.Camera;
-import com.remoteyourcam.usb.ptp.PtpConstants;
 import com.remoteyourcam.usb.ptp.model.LiveViewData;
 import com.remoteyourcam.usb.ptp.model.ObjectInfo;
 import com.remoteyourcam.usb.util.AsyncResponse;
+import com.remoteyourcam.usb.util.PictureOperations;
+import com.remoteyourcam.usb.util.PowerSavingListener;
+import com.remoteyourcam.usb.util.PowerSavingService;
 import com.remoteyourcam.usb.util.Upload;
 
 import org.json.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 
 import androidmads.library.qrgenearator.QRGContents;
 import androidmads.library.qrgenearator.QRGEncoder;
@@ -45,10 +43,11 @@ import androidmads.library.qrgenearator.QRGEncoder;
  * status bar and navigation/system bar) with user interaction.
  */
 public class FotoboothActivity extends CameraBaseActivity implements Camera.CameraListener, Camera.StorageInfoListener,
-        Camera.RetrieveImageInfoListener, Camera.RetrieveImageListener, AsyncResponse {
+        Camera.RetrieveImageInfoListener, Camera.RetrieveImageListener, AsyncResponse, PowerSavingListener {
 
     private Handler handler;
     private Runnable runnable;
+    private PowerSavingService powerSavingService;
 
     private Button mStartPhotoboothCountdownBtn;
     private TextView mCountdownText;
@@ -186,6 +185,10 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        powerSavingService = new PowerSavingService(this, this);
+
+        PictureOperations.setBorderBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.border));
+
         mVisible = true;
         mContentView = findViewById(R.id.fullscreen_content);
         mStartPhotoboothCountdownBtn = (Button)findViewById(R.id.startPhotoboothCountdownBtn);
@@ -278,6 +281,26 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
                 startQRMode();
             }
         });
+
+        mContentView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                powerSavingService.newUserInteraction();
+            }
+        });
+
+    }
+
+    public void startDashboardMode() {
+        mDashboardLayout.setVisibility(View.VISIBLE);
+
+        mPreviewLayout.setVisibility(View.INVISIBLE);
+        mPictureTakenLayout.setVisibility(View.INVISIBLE);
+        mReviewLayout.setVisibility(View.INVISIBLE);
+        mQRLayout.setVisibility(View.INVISIBLE);
+
+        if (this.camera != null) {
+            this.camera.setLiveView(false);
+        }
     }
 
     public void startPrevieMode() {
@@ -469,9 +492,12 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
             @Override
             public void run() {
-
-                mTakenPicture.setImageBitmap(image);
-                mTakenPictureBitmap = image;
+                if (true) {
+                    mTakenPictureBitmap = PictureOperations.applyBorder(image, 0.9f);
+                } else {
+                    mTakenPictureBitmap = image;
+                }
+                mTakenPicture.setImageBitmap(mTakenPictureBitmap);
                 mKeepPictureBtn.setEnabled(true);
             }
         });
@@ -509,7 +535,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     public void processFinish(String output) {
         try {
             JSONObject obj = new JSONObject(output);
-            Integer imageId = obj.getJSONObject("image").getInt("id");
+            int imageId = obj.getJSONObject("image").getInt("id");
             photoDownloadLink = "https://weddingapi.never-al.one/getImage/".concat(Integer.toString(imageId));
 
             QRGEncoder qrgEncoder = new QRGEncoder(
@@ -534,6 +560,18 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    @Override
+    public void onPowerSavingTurnCameraOff() {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                startDashboardMode();
+            }
+        });
 
     }
 }
