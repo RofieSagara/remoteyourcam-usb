@@ -85,6 +85,12 @@ public class PowerSavingService {
         this.handler.postDelayed(runnableCameraOff, DELAY_CAMERA_OFF);
     }
 
+    public void unbindPowerSaving() {
+        this.handler.removeCallbacks(runnableTurnScreenDown);
+        this.handler.removeCallbacks(runnableTurnScreenDownRequestAction);
+        this.handler.removeCallbacks(runnableCameraOff);
+    }
+
     public void newUserInteraction() {
         this.restartPowerSavingCountdowns();
         turnBrightnessUp(SCREEN_BRIGHNESS_DEFAULT);

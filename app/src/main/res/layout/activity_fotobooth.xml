@@ -77,14 +77,14 @@
 
         <Button
             android:id="@+id/startPhotoboothCountdownBtn"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:layout_gravity="center_horizontal|center_vertical"
             android:background="@drawable/button_bg_round"
             android:contentDescription="@string/photobooth_take_photo"
             android:drawableLeft="@drawable/ic_camera_alt_black_24dp"
             android:elevation="8dp"
-            android:paddingLeft="22dp"
+            android:paddingLeft="40dp"
             android:textSize="50sp"
             android:visibility="visible" />
 
@@ -175,12 +175,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableStart="@drawable/ic_clear_black_24dp"
+                android:backgroundTint="@color/colorAccent"
+                android:drawableStart="@drawable/ic_clear_white_24dp"
                 android:paddingLeft="15sp"
                 android:paddingTop="20sp"
                 android:paddingRight="15sp"
                 android:paddingBottom="20sp"
-                android:text="Abbrechen"
+                android:text="Nicht behalten"
+                android:textColor="@color/design_default_color_on_primary"
                 android:textSize="24sp" />
         </LinearLayout>
     </FrameLayout>
@@ -188,7 +190,8 @@
     <FrameLayout
         android:id="@+id/layout_picture_review"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="invisible">
 
         <ImageView
             android:id="@+id/bitmap_review_picture"
@@ -224,7 +227,8 @@
     <FrameLayout
         android:id="@+id/layout_qr"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -247,14 +251,44 @@
                     android:layout_weight="0.8"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/qr_image"
+                    <FrameLayout
                         android:layout_width="300dp"
                         android:layout_height="300dp"
                         android:layout_gravity="center_horizontal|center_vertical"
-                        android:layout_weight="1"
-                        android:scaleType="fitCenter"
-                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                        android:layout_weight="1">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:orientation="vertical">
+
+                            <ProgressBar
+                                android:id="@+id/progressBar2"
+                                style="?android:attr/progressBarStyle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:maxWidth="70dp"
+                                android:maxHeight="70dp"
+                                android:minWidth="70dp"
+                                android:minHeight="70dp" />
+
+                            <TextView
+                                android:id="@+id/textView6"
+                                style="@style/Widget.AppCompat.TextView.Big"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="QR-Code wird generiert..." />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/qr_image"
+                            android:layout_width="300dp"
+                            android:layout_height="300dp"
+                            android:layout_gravity="center_horizontal|center_vertical"
+                            android:scaleType="fitCenter"
+                            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                    </FrameLayout>
 
                     <TextView
                         android:id="@+id/textView2"

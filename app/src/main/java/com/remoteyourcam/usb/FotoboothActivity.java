@@ -75,7 +75,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
     private int mCurrentCountDownValue;
     private Bitmap mTakenPictureBitmap;
 
-    private Upload uploader = new Upload();
+    private Upload uploader;
 
     private String photoDownloadLink;
 
@@ -216,8 +216,6 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
         mCountdownText.setVisibility(View.INVISIBLE);
 
-        uploader.setDelegate(this);
-
 
         //Upload.upload(image, "Filename.jpg");
 
@@ -323,6 +321,7 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
     public void startPictureTakenMode() {
         mTakenPicture.setImageBitmap(null);
+        mQrImageView.setImageBitmap(null);
         mKeepPictureBtn.setEnabled(false);
         camera.capture();
         //camera.retrievePicture(1);
@@ -368,7 +367,9 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
     public void startUpload() {
         try {
-           uploader.execute(mTakenPictureBitmap);
+            uploader = new Upload();
+            uploader.setDelegate(this);
+            uploader.execute(mTakenPictureBitmap);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -384,6 +385,13 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
         ptp.setCameraListener(this);
         ptp.initialize(this, getIntent());
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.powerSavingService.unbindPowerSaving();
+    }
+
     public void onCameraStarted(final Camera camera) {
         Log.i("FotoboothActivity", "onCameraStarted");
         super.onCameraStarted(camera);
