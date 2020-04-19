@@ -240,18 +240,21 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
         mStartPhotoboothCountdownBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startPhotoCountdown();
             }
         });
 
         mStartPreviewMode.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startPrevieMode();
             }
         });
 
         mCancelPictureBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 mTakenPicture.setImageBitmap(null);
                 startPrevieMode();
             }
@@ -259,23 +262,27 @@ public class FotoboothActivity extends CameraBaseActivity implements Camera.Came
 
         mKeepPictureBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startReviewMode();
             }
         });
 
         mTakeNewPhotoBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startPrevieMode();
             }
         });
         mQrNewPhotoBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startPrevieMode();
             }
         });
 
         mShowQrBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                powerSavingService.newUserInteraction();
                 startQRMode();
             }
         });
