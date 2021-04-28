@@ -23,6 +23,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.usb.UsbDevice;
+import android.mtp.MtpConstants;
 import android.mtp.MtpDevice;
 import android.mtp.MtpObjectInfo;
 import android.mtp.MtpStorageInfo;
@@ -212,34 +213,41 @@ public class MainActivity extends SessionActivity implements CameraListener {
 
     @Override
     public void onCameraStarted(final Camera camera) {
-        Toast.makeText(this, "onCameraStarted", Toast.LENGTH_SHORT);
+        Toast.makeText(this, "onCameraStarted", Toast.LENGTH_SHORT).show();
+        ((App) getApplication()).setCamera(camera);
         this.camera = camera;
         if (AppConfig.LOG) {
             Log.i(TAG, "camera started");
         }
         try {
             dismissDialog(DIALOG_NO_CAMERA);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
         }
         if (camera instanceof EosCamera) {
-            final EosCamera eosCamera = (EosCamera) camera;
-            final PtpUsbConnection connection = eosCamera.getConnection();
+            // final EosCamera eosCamera = (EosCamera) camera;
+            // final PtpUsbConnection connection = eosCamera.getConnection();
             Button btn = findViewById(R.id.load_sd_btn);
             btn.setVisibility(View.VISIBLE);
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    MtpDevice device = new MtpDevice(eosCamera.device);
-                    device.open(connection.connection);
-                    ArrayList<String> filenames = new ArrayList<>();
-                    List<MtpObjectInfo> infos = getObjectList(device, 131073, -1879048192);
-                    for (MtpObjectInfo info : infos) {
-                        filenames.add(info.getName()); // TODO build tree of files with handles fd
-                    }
-                    //Intent i = new Intent(MainActivity.this, FilenameActivity.class);
-                    //i.putExtra("filenames", filenames);
-                    //startActivity(i);
-                }
+            btn.setOnClickListener(view -> {
+//                    MtpDevice device = new MtpDevice(eosCamera.device);
+//                    device.open(connection.connection);
+//                    ArrayList<String> filenames = new ArrayList<>();
+//                    List<MtpObjectInfo> infos = getObjectList(device, 131073, -1879048192);
+//
+//                    int[] storageIds = device.getStorageIds();
+//                    if (storageIds == null) {
+//                        return;
+//                    }
+//                    ArrayList<MtpObjectInfo> filesPath = new ArrayList<>();
+//                    for (int storageId : storageIds) {
+//                        filesPath.addAll(scanObjectsInStorage(device, storageId, 0, 0));
+//                    }
+//                    for (MtpObjectInfo info : filesPath) {
+//                        filenames.add(info.getName());
+//                    }
+                Intent i = new Intent(MainActivity.this, FilenameActivity.class);
+                //i.putExtra("filenames", filenames);
+                startActivity(i);
             });
         }
         getSupportActionBar().setTitle(camera.getDeviceName());
@@ -346,6 +354,66 @@ public class MainActivity extends SessionActivity implements CameraListener {
     @Override
     public void onObjectAdded(int handle, int format) {
         sessionFrag.objectAdded(handle, format);
+    }
+
+    private List<MtpObjectInfo> scanObjectsInStorage(MtpDevice mtpDevice, int storageId, int format, int parent) {
+        ArrayList<MtpObjectInfo> filesObjects = new ArrayList<>();
+        int[] objectHandles = mtpDevice.getObjectHandles(storageId, format, parent);
+        if (objectHandles == null) {
+            return new ArrayList<>();
+        }
+
+        for (int objectHandle : objectHandles) {
+            // Limit only 50 to make this apps not slow as fuck
+            if (filesObjects.size() > 10) {
+                return filesObjects;
+            }
+
+            /*
+             *　It's an abnormal case that you can't acquire MtpObjectInfo from MTP device
+             */
+            MtpObjectInfo mtpObjectInfo = mtpDevice.getObjectInfo(objectHandle);
+            if (mtpObjectInfo == null) {
+                continue;
+            }
+
+            /*
+             * Skip the object if parent doesn't match
+             */
+            int parentOfObject = mtpObjectInfo.getParent();
+            if (parentOfObject != parent) {
+                continue;
+            }
+
+            int associationType = mtpObjectInfo.getAssociationType();
+
+            if (associationType == MtpConstants.ASSOCIATION_TYPE_GENERIC_FOLDER) {
+                /* Scan the child folder */
+                filesObjects.addAll(scanObjectsInStorage(mtpDevice, storageId, format, objectHandle));
+            } else if (mtpObjectInfo.getFormat() == MtpConstants.FORMAT_EXIF_JPEG &&
+                    mtpObjectInfo.getProtectionStatus() != MtpConstants.PROTECTION_STATUS_NON_TRANSFERABLE_DATA) {
+                filesObjects.add(mtpObjectInfo);
+                /*
+                 *  get bitmap data from the object
+                 */
+/*                byte[] rawObject = mtpDevice.getObject(objectHandle, mtpObjectInfo.getCompressedSize());
+                Bitmap bitmap = null;
+                if (rawObject != null) {
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    int scaleW = (mtpObjectInfo.getImagePixWidth() - 1) / MAX_IMAGE_WIDTH + 1;
+                    int scaleH = (mtpObjectInfo.getImagePixHeight() - 1) / MAX_IMAGE_HEIGHT  + 1;
+                    int scale = Math.max(scaleW, scaleH);
+                    if (scale > 0) {
+                        options.inSampleSize = scale;
+                        bitmap = BitmapFactory.decodeByteArray(rawObject, 0, rawObject.length, options);
+                    }
+                }
+                if (bitmap != null) {
+                    publishProgress(bitmap);
+                }*/
+            }
+        }
+        return filesObjects;
     }
 
     public List<MtpStorageInfo> getStorageList(MtpDevice device) {

@@ -12,6 +12,7 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
+        android:name=".App"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:largeHeap="true"
